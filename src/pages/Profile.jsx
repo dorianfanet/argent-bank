@@ -32,8 +32,6 @@ export default function Profile() {
     }
   
     const response = await request("POST", "http://localhost:3001/api/v1/user/profile", headers)
-
-    console.log(response)
   
     if(response.status === 200){
       setFirstName(response.body.firstName)
@@ -72,12 +70,8 @@ export default function Profile() {
       firstName: data.firstName,
       lastName: data.lastName
     })
-
-    console.log(reqBody)
   
     const response = await request("PUT", "http://localhost:3001/api/v1/user/profile", headers, reqBody)
-
-    console.log(response)
 
     if(response.status === 200){
       setFirstName(response.body.firstName)
@@ -87,7 +81,6 @@ export default function Profile() {
   }
 
   function hide() {
-    console.log('yes')
     setEditNameToggle(false)
   }
 

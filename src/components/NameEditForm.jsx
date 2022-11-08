@@ -62,16 +62,13 @@ export default function NameEditForm({ show, firstName, lastName, handleSubmit, 
 
   function handleOnChangeFirst(e) {
     setInputValues({...inputValues, firstName: e.target.value})
-    console.log(inputValues)
   }
   function handleOnChangeLast(e) {
     setInputValues({...inputValues, lastName: e.target.value})
-    console.log(inputValues)
   }
 
   function handleSave(e) {
     e.preventDefault()
-    console.log(inputValues)
     handleSubmit({
       firstName: inputValues.firstName,
       lastName: inputValues.lastName

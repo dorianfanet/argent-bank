@@ -4,10 +4,6 @@ import Form from '../components/SignInForm'
 
 export default function SignIn() {
 
-  function handleSubmit(data) {
-    console.log(data)
-  }
-
   return (
     <main className="main bg-dark">
       <section className="sign-in-content">
@@ -15,7 +11,6 @@ export default function SignIn() {
         <h1>Sign In</h1>
         <Form
           buttonText={'Sign In'}
-          onFormSubmit={handleSubmit}
         />
       </section>
     </main>

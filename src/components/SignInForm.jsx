@@ -11,7 +11,7 @@ const ErrorMessage = styled.p`
   color: red;
 `
 
-export default function Form({ children, buttonText, onFormSubmit }) {
+export default function Form({ buttonText }) {
   const navigateTo = useNavigate();
   const dispatch = useDispatch()
 

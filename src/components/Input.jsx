@@ -55,7 +55,6 @@ export default function Input({ className, labelText, type, id, handleOnChange, 
   const [spanHeight, setSpanHeight] = useState()
 
   useEffect(() => {
-    console.log(ref.current.offsetHeight)
     setSpanHeight(`${ref.current.offsetHeight + 3.5}px`)
   }, [])
 
