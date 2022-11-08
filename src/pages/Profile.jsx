@@ -1,7 +1,11 @@
 import NameEditForm from "../components/NameEditForm"
 import styled from "styled-components"
-import { useState, useRef } from 'react'
-import { useEffect } from "react"
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from "react-redux"
+import { selectToken } from "../store/selectors"
+import { useNavigate } from "react-router-dom"
+import { request } from "../services/request"
+import { setUserData } from "../store/store"
 
 const Header = styled.div`
   position: relative;
@@ -11,58 +15,44 @@ const Header = styled.div`
     pointer-events: all;
 
     &.hide{
-      opacity: 0;
+      opacity: 1;
       pointer-events: none;
     }
   }
 `
 
-const Title = styled.h1`
-
-  & div{
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-
-    & span{
-      text-align: right;
-      transition: all 300ms ease;
-
-      &.align-left{
-        text-align: left;
-      }
-    }
-  }
-
-  &.hide{
-    
-    & div{
-      
-
-      & span{
-        width: 100%;
-      }
-    }
-  }
-`
-
-const Span1 = styled.span`
-  width: ${props => props.firstNameWidth};
-`
-
-const Span2 = styled.span`
-  width: ${props => props.lastNameWidth};
-`
-
 export default function Profile() {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const token = useSelector(selectToken)
 
-  const refSpan1 = useRef(null)
-  const refSpan2 = useRef(null)
+  async function getUserData() {
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    }
+  
+    const response = await request("POST", "http://localhost:3001/api/v1/user/profile", headers)
+
+    console.log(response)
+  
+    if(response.status === 200){
+      setFirstName(response.body.firstName)
+      setLastName(response.body.lastName)
+      dispatch(setUserData({firstName: response.body.firstName, lastName: response.body.lastName}))
+    }
+  }
+
+  useEffect(() => {
+    if(!token){
+      navigate('/sign-in')
+    }
+    getUserData()
+  })
+
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
 
   const [editNameToggle, setEditNameToggle] = useState(false)
-
-  const [firstNameWidth, setFirstNameWidth] = useState()
-  const [lastNameWidth, setLastNameWidth] = useState()
 
   function handleEditNameClick() {
     if(editNameToggle === false) {
@@ -72,24 +62,48 @@ export default function Profile() {
     }
   }
 
-  useEffect(() => {
-    setFirstNameWidth(refSpan1.current.clientWidth + 'px')
-    setLastNameWidth(refSpan2.current.clientWidth + 'px')
-  }, [])
+  async function handleEditNameSubmit(data) {
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
 
-  return (
+    const reqBody = JSON.stringify({
+      firstName: data.firstName,
+      lastName: data.lastName
+    })
+
+    console.log(reqBody)
+  
+    const response = await request("PUT", "http://localhost:3001/api/v1/user/profile", headers, reqBody)
+
+    console.log(response)
+
+    if(response.status === 200){
+      setFirstName(response.body.firstName)
+      setLastName(response.body.lastName)
+      dispatch(setUserData({firstName: response.body.firstName, lastName: response.body.lastName}))
+    }
+  }
+
+  function hide() {
+    console.log('yes')
+    setEditNameToggle(false)
+  }
+
+  return token && (
     <main className="main bg-dark">
       <Header className="header">
         <NameEditForm
           show={editNameToggle}
+          firstName={firstName}
+          lastName={lastName}
+          handleSubmit={handleEditNameSubmit}
+          hide={hide}
         />
-        <Title className={editNameToggle ? 'hide' : ''}>
-          Welcome back
-          <div>
-            <Span1 ref={refSpan1} firstNameWidth={firstNameWidth}>Christophe</Span1>
-            <Span2 ref={refSpan2} lastNameWidth={lastNameWidth} className="align-left">Jarvis!</Span2>
-          </div>
-        </Title>
+        <h1 className={editNameToggle ? 'hide' : ''}>
+          Welcome back <br /> {firstName} {lastName}!
+        </h1>
         <button className={`edit-button ${editNameToggle ? 'hide' : ''}`} onClick={handleEditNameClick}>Edit Name</button>
       </Header>
       <h2 className="sr-only">Accounts</h2>

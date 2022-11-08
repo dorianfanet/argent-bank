@@ -2,9 +2,18 @@ import Input from './Input'
 import { useState } from 'react'
 import { request } from '../services/request'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setToken } from '../store/store'
+import styled from 'styled-components'
+
+const ErrorMessage = styled.p`
+  text-align: left;
+  color: red;
+`
 
 export default function Form({ children, buttonText, onFormSubmit }) {
   const navigateTo = useNavigate();
+  const dispatch = useDispatch()
 
   const initialState = {
     username: {
@@ -21,6 +30,7 @@ export default function Form({ children, buttonText, onFormSubmit }) {
   }
 
   const [data, setData] = useState(initialState)
+  const [logInError, setLogInError] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -39,31 +49,32 @@ export default function Form({ children, buttonText, onFormSubmit }) {
         }
       }
     )
-    const body = JSON.stringify({
-      email: "steve@rogers.com",
-      password: "password456"
-    })
-
-    const headers = {
-      'Content-Type': 'application/json'
-    }
-
-    const response = await request("POST", "http://localhost:3001/api/v1/user/login", headers, body)
-
-    console.log(response)
-    if(response.status === 200) {
-      navigateTo('/profile')
-    }
     if(!data.username.error && !data.password.error && data.username.value.length > 0 && data.password.value.length > 0) {
-      console.log(data)
-      
+      const body = JSON.stringify({
+        email: data.username.value,
+        password: data.password.value
+      })
+  
+      const headers = {
+        'Content-Type': 'application/json'
+      }
+  
+      const response = await request("POST", "http://localhost:3001/api/v1/user/login", headers, body)
+  
+      if(response.status === 200) {
+        dispatch(setToken(response.body.token))
+        navigateTo('/profile')
+      }
+      if(response.status === 400) {
+        setLogInError(true)
+      }
     }
   }
 
   function isRegexValid(inputType, value) {
     const regexTypes = {
       username: /[a-zA-Z][a-zA-Z0-9-_]{2,}/,
-      password: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
+      password: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{8,}$/
     }
     const re = regexTypes[inputType];
     console.log(value)
@@ -93,6 +104,9 @@ export default function Form({ children, buttonText, onFormSubmit }) {
         handleOnChange={handleChangeText}
         errorMessage='Your password should at least contain 8 characters, 1 uppercase letter, 1 lowercase letter and 1 number'
       />
+      {logInError && (
+        <ErrorMessage>Email/password are not correct</ErrorMessage>
+      )}
       <Input
         className={'input-remember'}
         labelText={'Remember me'}

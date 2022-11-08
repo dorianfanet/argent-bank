@@ -1,42 +1,44 @@
 import Input from "./Input"
 import styled from "styled-components"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-const Form = styled.form`
+const Form = styled.div`
   display: flex;
-  justify-content: center;
-  gap: 6px;
-  position: absolute;
-  top: 41.9px;
-  left: 50%;
-  transform: translate(-50%, 0);
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
   opacity: 0;
-  transition: all 200ms 300ms ease;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 41px;
+  background-color: #12002b;
+  pointer-events: none;
+  transition: all 200ms ease;
 
   &.show{
     opacity: 1;
-
-    & .button-container{
-      pointer-events: all;
-    }
+    pointer-events: all;
   }
 
   & input{
     background-color: rgb(34, 12, 61) !important;
     color: white;
     width: 200px;
-    padding: 0 2px;
+    padding: 0 10px;
     border: 2px solid #5b4676 !important;
     font-size: 2em;
     font-weight: bold;
   }
 
-  & .button-container{
-    position: absolute;
+  & div.input-container{
     display: flex;
-    top: 67px;
-    gap: 6px;
-    pointer-events: none;
+    gap: 10px;
+  }
+
+  & div.button-container{
+    display: flex;
+    gap: 10px;
 
     & button{
       margin: 0;
@@ -46,45 +48,61 @@ const Form = styled.form`
   }
 `
 
-export default function NameEditForm({ show }) {
+export default function NameEditForm({ show, firstName, lastName, handleSubmit, hide }) {
+  useEffect(() => {
+    setInputValues({
+      firstName: firstName,
+      lastName: lastName
+    })
+  }, [firstName, lastName])
 
-  const initialValues = {
-    firstName: 'Tony',
-    lastName: 'Jarvis'
+  const [inputValues, setInputValues] = useState({})
+
+  console.log(inputValues)
+
+  function handleOnChangeFirst(e) {
+    setInputValues({...inputValues, firstName: e.target.value})
+    console.log(inputValues)
   }
-
-  const [inputValues, setInputValues] = useState(initialValues)
-
-  function handleOnChange(e) {
-    console.log(e.target.value)
-    setInputValues({...inputValues, [e.target.id]: e.target.value})
+  function handleOnChangeLast(e) {
+    setInputValues({...inputValues, lastName: e.target.value})
+    console.log(inputValues)
   }
 
   function handleSave(e) {
     e.preventDefault()
+    console.log(inputValues)
+    handleSubmit({
+      firstName: inputValues.firstName,
+      lastName: inputValues.lastName
+    })
+    hide()
   }
 
   function handleCancel(e) {
     e.preventDefault()
+    hide()
   }
 
   return (
     <Form className={show ? 'show' : ''}>
-      <Input
-        className='right'
-        type='text'
-        id='firstName'
-        handleOnChange={handleOnChange}
-        value={inputValues.firstName}
-      />
-      <Input
-        type='text'
-        id='lastName'
-        handleOnChange={handleOnChange}
-        value={inputValues.lastName}
-      />
+      <div className="input-container">
+        <Input
+          className='right'
+          type='text'
+          id='firstName'
+          handleOnChange={handleOnChangeFirst}
+          value={inputValues.firstName ? inputValues.firstName : firstName}
+        />
+        <Input
+          type='text'
+          id='lastName'
+          handleOnChange={handleOnChangeLast}
+          value={inputValues.lastName ? inputValues.lastName : lastName}
+        />
+      </div>
       <div className="button-container">
-        <button onClick={handleSave}>Save</button>
+        <button type="submit" onClick={handleSave}>Save</button>
         <button onClick={handleCancel}>Cancel</button>
       </div>
     </Form>
