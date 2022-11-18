@@ -14,6 +14,7 @@ export default function Header() {
 
   function handleLogOut() {
     dispatch(logOut())
+    localStorage.removeItem('token')
   }
 
   return (

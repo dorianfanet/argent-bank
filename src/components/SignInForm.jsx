@@ -64,6 +64,9 @@ export default function Form({ buttonText }) {
       if(response.status === 200) {
         dispatch(setToken(response.body.token))
         navigateTo('/profile')
+        if(data.remember){
+          localStorage.setItem('token', response.body.token)
+        }
       }
       if(response.status === 400) {
         setLogInError(true)
@@ -77,13 +80,11 @@ export default function Form({ buttonText }) {
       password: /^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{8,}$/
     }
     const re = regexTypes[inputType];
-    console.log(value)
-    return !re.test(value)
+      return !re.test(value)
   }
 
   function handleChangeText(e) {
     setData({...data, [e.target.id]: {name: e.target.id, value: e.target.value, error: isRegexValid(e.target.id, e.target.value)}})
-    console.log(data)
   }
 
   return (

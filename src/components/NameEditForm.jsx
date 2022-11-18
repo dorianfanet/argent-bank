@@ -58,8 +58,6 @@ export default function NameEditForm({ show, firstName, lastName, handleSubmit, 
 
   const [inputValues, setInputValues] = useState({})
 
-  console.log(inputValues)
-
   function handleOnChangeFirst(e) {
     setInputValues({...inputValues, firstName: e.target.value})
   }

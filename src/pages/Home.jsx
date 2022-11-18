@@ -16,8 +16,9 @@ export default function Home() {
       </div>
       <section className="features">
         <h2 className="sr-only">Features</h2>
-        {homeFeaturesData.map((feature) => 
+        {homeFeaturesData.map((feature, index) => 
           <HomeFeature
+            key={index}
             img={feature.img}
             alt={feature.alt}
             title={feature.title}
